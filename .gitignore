@@ -1,0 +1,43 @@
+# CMake build directory
+build/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.filter
+*.tfstate
+*.tfstate.backup
+
+# Environment files
+.env*
+*.env.local
+*.env.development
+*.env.test
+*.env.production
+
+# Freebuff workspace metadata
+.freebuff/
+
+# Cloud attachments
+.cloud-attachments/
+
+# Generated data shards (large - typically not versioned, use setup_ocr.sh to regenerate)
+data/train10k/
+
+# Compiled objects and executables
+tools/ocr_infer
+tools/crnn_trainer
+tools/hello_crnn/hello_crnn
+
+# NeoML shared libraries (system/third-party)
+third_party/neoml/
+third_party/freetype/
+third_party/stb/
+
+# Build artifacts
+*.o
+*.so
+*.a
+
+# VS Code and other IDE
+*.filters

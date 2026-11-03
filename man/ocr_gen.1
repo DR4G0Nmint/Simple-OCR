@@ -1,0 +1,94 @@
+.\" Manual page for ocr_gen
+.\" Generated for the OCR-AI C++17 project
+.TH OCR_GEN 1 "2026-11-03" "OCR-AI" "User commands"
+.SH NAME
+ocr_gen - synthetic OCR training data generator
+.SH SYNOPSIS
+./ocr_gen \-\-fonts DIR \-\-out DIR \-\-count N \-\-shard-size N \-\-seed N \-\-quiet
+.SH DESCRIPTION
+Generates a synthetic OCR dataset consisting of `.ocrb` shards, a manifest, and
+optional sample dumps. All text, backgrounds, and degradations are produced
+procedurally in C++17 with no Python dependency.
+.PP
+The tool supports three text modes (\-\-mode), augmentation profiles
+(\-\-augment), and font/background filtering. Output shards follow the OCRB
+binary format documented in `FORMAT.md`.
+.SH OPTIONS
+.PP
+\- fonts DIR
+    Directory tree scanned for .ttf/.otf fonts (required).
+.PP
+\- backgrounds DIR
+    Optional directory of PNG/JPEG images used as backgrounds (stb_image decode).
+.PP
+\- out DIR
+    Output directory for shards and manifest.json.
+.PP
+\- count N
+    Number of images to generate (default: 10000).
+.PP
+\- shard-size N
+    Records per shard (default: 10000).
+.PP
+\- seed N
+    Master seed for deterministic generation (default: 1234). Per-record seeds
+    are derived as deriveSeed(master_seed, record_index).
+.PP
+\- width N \- height N
+    Image geometry (default: 128x32).
+.PP
+\- channels N
+    1 = grayscale, 3 = RGB (default: 1).
+.PP
+\- charset STR
+    Character set for \-\-mode random-char.
+.PP
+\- mode MODE
+    Text generation mode: random-char | words | numeric.
+.PP
+\- wordlist FILE
+    Path to a word list (required with \-\-mode words).
+.PP
+\- len-min N \- len-max N
+    Label length range (default: 3..20).
+.PP
+\- size-min N \- size-max N
+    Font pixel size range (default: 20..48).
+.PP
+\- threads N
+    Worker threads (default: hardware_concurrency).
+.PP
+\- augment PROFILE
+    Augmentation intensity: full (default) | light | none.
+.PP
+\- quiet
+    Suppress per-image progress output.
+.PP
+Verification options:
+.PP
+\- verify DIR
+    Validate shards in DIR (structure, checksums).
+.PP
+\- dump DIR
+    Write sample images as .pnm next to labels.txt.
+.PP
+\- verify-count N
+    Number of samples to dump (default: 50).
+.SH SHARD FORMAT
+All integers little-endian.
+.nf
+file   := "OCRB" | version:u32 | num_records:u32 | record{num_records}
+record := label_len:u32 | label:u8[label_len]
+        | h:u32 | w:u32 | ch:u32 | pixels:u8[h*w*ch]
+.fi
+.PP
+version is always 1. The manifest.json alongside the shard records count,
+bytes, and SHA-256 per shard.
+.SH REPRODUCIBILITY
+The same (seed, options) pair always produces byte-identical shards, regardless
+of thread count, because each record is seeded via deriveSeed(master_seed,
+record_index) and records are reordered by index before writing.
+.SH SEE ALSO
+FORMAT.md, BENCHMARKS.md, README.md
+.SH AUTHOR
+Built with NeoML and vendored FreeType. No Python involved.
